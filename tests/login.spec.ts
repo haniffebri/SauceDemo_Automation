@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 
-//=====> Test Case 1
+//=====> TC-LOGIN-01
 
-test('login dengan data login yang benar', async ({ page }) => {
+
+test('TC-LOGIN-01 : login dengan data login yang benar', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('standard_user');
@@ -15,10 +16,10 @@ test('login dengan data login yang benar', async ({ page }) => {
 });
 
 
-//=====> Test Case 2
+//=====> TC-LOGIN-02
 
 
-test('login dengan akun locked out', async ({ page }) => {
+test('TC-LOGIN-02 : login dengan akun locked out', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('locked_out_user');
@@ -34,10 +35,10 @@ test('login dengan akun locked out', async ({ page }) => {
 });
 
 
-//=====> Test Case 3
+//=====> TC-LOGIN-03
 
 
-test('login dengan akun problem user', async ({ page }) => {
+test('TC-LOGIN-03 : login dengan akun problem user', async ({ page }) => {
    await page.goto('https://www.saucedemo.com/');
 
   await page.goto('https://www.saucedemo.com/');
@@ -51,10 +52,10 @@ test('login dengan akun problem user', async ({ page }) => {
 });
 
 
-//=====> Test Case 4
+//=====> TC-LOGIN-04
 
 
-test('login dengan akun performance_glitch_user', async ({ page }) => {
+test('TC-LOGIN-04 : login dengan akun performance_glitch_user', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('performance_glitch_user');
@@ -71,10 +72,10 @@ test('login dengan akun performance_glitch_user', async ({ page }) => {
 });
 
 
-//=====> Test Case 5
+//=====> TC-LOGIN-05
 
 
-test('login dengan akun error_user', async ({ page }) => {
+test('TC-LOGIN-05 : login dengan akun error_user', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('error_user');
@@ -91,10 +92,10 @@ test('login dengan akun error_user', async ({ page }) => {
 });
 
 
-//=====> Test Case 6
+//=====> TC-LOGIN-06
 
 
-test('login dengan akun visual_user', async ({ page }) => {
+test('TC-LOGIN-06 : login dengan akun visual_user', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('visual_user');
@@ -111,10 +112,10 @@ test('login dengan akun visual_user', async ({ page }) => {
 });
 
 
-//=====> Test Case 7
+//=====> TC-LOGIN-07
 
 
-test('login dengan akun without fill username', async ({ page }) => {
+test('TC-LOGIN-07 : login dengan akun without fill username', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('');
@@ -130,10 +131,10 @@ test('login dengan akun without fill username', async ({ page }) => {
 });
 
 
-//=====> Test Case 8
+//=====> TC-LOGIN-08
 
 
-test('login dengan akun without fill password', async ({ page }) => {
+test('TC-LOGIN-08 : login dengan akun without fill password', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
   await page.locator('#user-name').fill('standard_user');
@@ -144,6 +145,25 @@ test('login dengan akun without fill password', async ({ page }) => {
 
   await expect(page.locator('[data-test="error"]')).toHaveText(
     'Epic sadface: Password is required'
+  );
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
+});
+
+
+//=====> TC-LOGIN-09
+
+
+test('TC-LOGIN-09 : login dengan invalid credential', async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+
+  await page.locator('#user-name').fill('mi-ongklok');
+  await page.locator('#password').fill('ongkloksauce');
+  await page.locator('#login-button').click();
+
+  await expect(page.locator('[data-test="error"]')).toBeVisible();
+
+  await expect(page.locator('[data-test="error"]')).toHaveText(
+    'Epic sadface: Username and password do not match any user in this service'
   );
   await expect(page).toHaveURL('https://www.saucedemo.com/');
 });
