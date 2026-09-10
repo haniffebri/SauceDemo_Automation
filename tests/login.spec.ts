@@ -156,7 +156,7 @@ test('TC-LOGIN-08 : login dengan akun without fill password', async ({ page }) =
 test('TC-LOGIN-09 : login dengan invalid credential', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
 
-  await page.locator('#user-name').fill('mi-ongklok');
+  await page.locator('#user-name').fill('miongklok');
   await page.locator('#password').fill('ongkloksauce');
   await page.locator('#login-button').click();
 
