@@ -1,76 +1,47 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
+import users from '../fixtures/user.fixture.json';
 
+test.describe('Module: Inventory & Cart', () => {
+  let inventoryPage: InventoryPage;
 
-//=====> TC-INV-01
+  test.beforeEach(async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(users.standard.username, users.standard.password);
+    inventoryPage = new InventoryPage(page);
+  });
+ 
+  test('TC-INV-01: daftar produk tampil (6 item)', async () => {
+    await expect(inventoryPage.productItems).toHaveCount(6);
+  });
 
+  test('TC-INV-02: sorting produk A-Z terurut benar', async () => {
+    await inventoryPage.sortBy('az');
+    const names = await inventoryPage.getAllProductNames();
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    expect(names).toEqual(sorted);
+  });
 
-test('TC-INV-01 : user dapat menambahkan satu produk ke cart', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
+  test('TC-INV-03: sorting produk Z-A terurut benar', async () => {
+    await inventoryPage.sortBy('za');
+    const names = await inventoryPage.getAllProductNames();
+    const sorted = [...names].sort((a, b) => b.localeCompare(a));
+    expect(names).toEqual(sorted);
+  });
 
-  await page.locator('#user-name').fill('standard_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
+  test('TC-INV-04: sorting harga rendah-tinggi', async () => {
+    await inventoryPage.sortBy('lohi');
+    const prices = await inventoryPage.getAllProductPrices();
+    const sorted = [...prices].sort((a, b) => a - b);
+    expect(prices).toEqual(sorted);
+  });
 
-  await expect(page).toHaveURL(/inventory.html/);
-
-  await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-
-  await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
-
-  await page.locator('[data-test="shopping-cart-link"]').click();
-
-  await expect(page).toHaveURL(/cart.html/);
-  await expect(page.locator('.inventory_item_name')).toHaveText(
-    'Sauce Labs Bike Light'
-  );
-});
-
-
-//=====> TC-INV-02
-
-
-test('TC-INV-02 : user dapat menambahkan dua produk ke keranjang', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('standard_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory.html/);
-
-  await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-
-  await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
-
-  await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-
-  await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('2');
-
-  await page.locator('[data-test="shopping-cart-link"]').click();
-
-  await expect(page).toHaveURL(/cart.html/);
-  await expect(page.getByText('Sauce Labs Backpack', { exact: true })).toBeVisible();
-  await expect(page.getByText('Sauce Labs Bike Light', { exact: true })).toBeVisible();
-});
-
-
-//=====> TC-INV-03
-
-
-test('TC-INV-03 : user dapat sorting produk Name A-Z', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('standard_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory.html/);
-
-  await page.locator('[data-test="product-sort-container"]').click();
-
-  await page.locator('[data-test="shopping-cart-link"]').click();
-
-  await expect(page).toHaveURL(/cart.html/);
-  await expect(page.getByText('Sauce Labs Backpack', { exact: true })).toBeVisible();
-  await expect(page.getByText('Sauce Labs Bike Light', { exact: true })).toBeVisible();
+  test('TC-INV-05: sorting harga tinggi-rendah', async () => {
+    await inventoryPage.sortBy('hilo');
+    const prices = await inventoryPage.getAllProductPrices();
+    const sorted = [...prices].sort((a, b) => b - a);
+    expect(prices).toEqual(sorted);
+  });
 });

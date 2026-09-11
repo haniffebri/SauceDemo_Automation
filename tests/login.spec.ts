@@ -1,169 +1,66 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import users from '../fixtures/user.fixture.json';
 
+test.describe('Module: Login', () => {
+  let loginPage: LoginPage;
 
-//=====> TC-LOGIN-01
-
-
-test('TC-LOGIN-01 : login dengan data login yang benar', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('standard_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory\.html/);
-  await expect(page.locator('.inventory_item')).toHaveCount(6);
-});
-
-
-//=====> TC-LOGIN-02
-
-
-test('TC-LOGIN-02 : login dengan akun locked out', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('locked_out_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-
-  await expect(page.locator('[data-test="error"]')).toHaveText(
-    'Epic sadface: Sorry, this user has been locked out.'
-  );
-  await expect(page).toHaveURL('https://www.saucedemo.com/');
-});
-
-
-//=====> TC-LOGIN-03
-
-
-test('TC-LOGIN-03 : login dengan akun problem user', async ({ page }) => {
-   await page.goto('https://www.saucedemo.com/');
-
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('problem_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory\.html/);
-  await expect(page.locator('.inventory_item')).toHaveCount(6);
-});
-
-
-//=====> TC-LOGIN-04
-
-
-test('TC-LOGIN-04 : login dengan akun performance_glitch_user', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('performance_glitch_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory\.html/, {
-    timeout: 15000,
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await loginPage.goto();
   });
 
-  await expect(
-    page.locator('[data-test="title"]')
-  ).toHaveText('Products');
-});
-
-
-//=====> TC-LOGIN-05
-
-
-test('TC-LOGIN-05 : login dengan akun error_user', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('error_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory\.html/, {
-    timeout: 15000,
+  // TC-LOGIN-01
+  test('TC-LOGIN-01: Verifikasi user dapat login dengan kredensial valid menggunakan standart_user', async () => {
+    await loginPage.login(users.standard.username, users.standard.password);
+    await loginPage.expectLoggedIn();
   });
 
-  await expect(
-    page.locator('[data-test="title"]')
-  ).toHaveText('Products');
-});
-
-
-//=====> TC-LOGIN-06
-
-
-test('TC-LOGIN-06 : login dengan akun visual_user', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('visual_user');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
-
-  await expect(page).toHaveURL(/inventory\.html/, {
-    timeout: 15000,
+  // TC-LOGIN-02
+  test('TC-LOGIN-02: Verifikasi sistem menolak akses login untuk user yang telah dikunci (locked_out_user)', async () => {
+    await loginPage.login(users.lockedOut.username, users.lockedOut.password);
+    await loginPage.expectErrorToContain('Sorry, this user has been locked out');
   });
 
-  await expect(
-    page.locator('[data-test="title"]')
-  ).toHaveText('Products');
-});
+  // TC-LOGIN-03
+  test('TC-LOGIN-03: Verifikasi user dapat login dengan kredensial valid menggunakan problem_user', async () => {
+    await loginPage.login(users.problem.username, users.problem.password);
+    await loginPage.expectLoggedIn();
+  });
 
+  // TC-LOGIN-04
+  test('TC-LOGIN-04: Verifikasi user dapat login dengan kredensial valid menggunakan performance_glitch_user', async () => {
+    await loginPage.login(users.performanceGlitch.username, users.standard.password);
+    await loginPage.expectLoggedIn();
+  });
 
-//=====> TC-LOGIN-07
+  // TC-LOGIN-05
+  test('TC-LOGIN-05: Verifikasi user dapat login dengan kredensial menggunakan error_user', async () => {
+    await loginPage.login(users.errorUser.username, users.standard.password);
+    await loginPage.expectLoggedIn();
+  });
 
+  // TC-LOGIN-06
+  test('TC-LOGIN-06: Verifikasi user dapat login dengan kredensial menggunakan visual_user', async () => {
+    await loginPage.login(users.visualUser.username, users.standard.password);
+    await loginPage.expectLoggedIn();
+  });
 
-test('TC-LOGIN-07 : login dengan akun without fill username', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
+  // TC-LOGIN-07
+  test('TC-LOGIN-07: Verifikasi validasi saat field username dikosongkan', async () => {
+    await loginPage.login('', users.standard.password);
+    await loginPage.expectErrorToContain('Epic sadface: Username is required');
+  });
 
-  await page.locator('#user-name').fill('');
-  await page.locator('#password').fill('secret_sauce');
-  await page.locator('#login-button').click();
+  // TC-LOGIN-08
+  test('TC-LOGIN-08: Verifikasi validasi saat field password dikosongkan', async () => {
+    await loginPage.login(users.standard.username, '');
+    await loginPage.expectErrorToContain('Epic sadface: Password is required');
+  });
 
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-
-  await expect(page.locator('[data-test="error"]')).toHaveText(
-    'Epic sadface: Username is required'
-  );
-  await expect(page).toHaveURL('https://www.saucedemo.com/');
-});
-
-
-//=====> TC-LOGIN-08
-
-
-test('TC-LOGIN-08 : login dengan akun without fill password', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('standard_user');
-  await page.locator('#password').fill('');
-  await page.locator('#login-button').click();
-
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-
-  await expect(page.locator('[data-test="error"]')).toHaveText(
-    'Epic sadface: Password is required'
-  );
-  await expect(page).toHaveURL('https://www.saucedemo.com/');
-});
-
-
-//=====> TC-LOGIN-09
-
-
-test('TC-LOGIN-09 : login dengan invalid credential', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  await page.locator('#user-name').fill('miongklok');
-  await page.locator('#password').fill('ongkloksauce');
-  await page.locator('#login-button').click();
-
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-
-  await expect(page.locator('[data-test="error"]')).toHaveText(
-    'Epic sadface: Username and password do not match any user in this service'
-  );
-  await expect(page).toHaveURL('https://www.saucedemo.com/');
+  // TC-LOGIN-09
+  test('TC-LOGIN-09: Verifikasi sistem menolak login dengan invalid credential', async () => {
+    await loginPage.login(users.invalid.username, users.invalid.password);
+    await loginPage.expectErrorToContain('Epic sadface: Username and password do not match any user in this service');
+  });
 });

@@ -31,6 +31,6 @@ export class LoginPage {
   }
 
   async expectLoggedIn() {
-    await expect(this.page).toHaveURL(/inventory\.html/);
+    await expect(this.page).toHaveURL(/inventory.html/);
   }
 }
