@@ -4,42 +4,51 @@ import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import users from '../fixtures/user.fixture.json';
 
-test.describe('Module: Inventory & Cart', () => {
+test.describe('Module: Cart', () => {
   let inventoryPage: InventoryPage;
+  let cartPage: CartPage;
 
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login(users.standard.username, users.standard.password);
     inventoryPage = new InventoryPage(page);
+    cartPage = new CartPage(page);
   });
  
-  test('CART-01: tambah 1 produk ke cart, badge = 1', async () => {
+  test('TC-CART-01: tambah 1 produk ke cart, produk bertambah 1', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
+
+    await inventoryPage.goToCart();
+    await expect(cartPage.productNames).toBeVisible;
   });
 
-  test('CART-02: tambah 3 produk ke cart, badge = 3', async () => {
+  test('TC-CART-02: tambah 2 produk ke cart, produk bertambah 2', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.expectCartBadge(2);
+  });
+
+  test('TC-CART-03: tambah 3 produk ke cart, produk bertambah 3', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.addProductToCart('Sauce Labs Bolt T-Shirt');
     await inventoryPage.expectCartBadge(3);
   });
 
-  test('CART-03: hapus produk dari inventory page, badge berkurang', async () => {
+  test('TC-CART-04: hapus 1 produk dari total 1, keranjang kosong', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
     await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
     await inventoryPage.expectCartBadge(0);
   });
 
-  // CART-04
-  test('CART-04: hapus produk dari halaman cart', async ({ page }) => {
+  test('TC-CART-05: hapus 1 produk dari total 2 produk, produk sisa 1', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
-    await inventoryPage.goToCart();
-    const cartPage = new CartPage(page);
-    await cartPage.expectItemCount(1);
-    await cartPage.removeItem('Sauce Labs Backpack');
-    await cartPage.expectItemCount(0);
+    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.expectCartBadge(2);
+    await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
+    await inventoryPage.expectCartBadge(1);
   });
 });

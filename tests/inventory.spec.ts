@@ -3,7 +3,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import users from '../fixtures/user.fixture.json';
 
-test.describe('Module: Inventory & Cart', () => {
+test.describe('Module: Inventory', () => {
   let inventoryPage: InventoryPage;
 
   test.beforeEach(async ({ page }) => {
@@ -43,5 +43,38 @@ test.describe('Module: Inventory & Cart', () => {
     const prices = await inventoryPage.getAllProductPrices();
     const sorted = [...prices].sort((a, b) => b - a);
     expect(prices).toEqual(sorted);
+  });
+
+  test('TC-INV-06: tambah 1 produk ke cart, badge = 1', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.expectCartBadge(1);
+  });
+
+  test('TC-INV-07: tambah 2 produk ke cart, badge = 2', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.expectCartBadge(2);
+  });
+
+  test('TC-INV-08: tambah 3 produk ke cart, badge = 3', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.addProductToCart('Sauce Labs Bolt T-Shirt');
+    await inventoryPage.expectCartBadge(3);
+  });
+
+  test('TC-INV-09: hapus 1 produk dari inventory page, badge berkurang jadi 0', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.expectCartBadge(1);
+    await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
+    await inventoryPage.expectCartBadge(0);
+  });
+
+  test('TC-INV-10: hapus 1 produk dari total 2 dari inventory page, badge berkurang jadi 1', async () => {
+    await inventoryPage.addProductToCart('Sauce Labs Backpack');
+    await inventoryPage.addProductToCart('Sauce Labs Bike Light');
+    await inventoryPage.expectCartBadge(2);
+    await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
+    await inventoryPage.expectCartBadge(1);
   });
 });
