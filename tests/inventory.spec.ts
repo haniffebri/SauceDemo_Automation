@@ -13,64 +13,64 @@ test.describe('Module: Inventory', () => {
     inventoryPage = new InventoryPage(page);
   });
  
-  test('TC-INV-01: daftar produk tampil (6 item)', async () => {
+  test('TC-INV-01: Verifikasi katalog daftar produk tampil dengan benar dan memuat 6 produk', async () => {
     await expect(inventoryPage.productItems).toHaveCount(6);
   });
 
-  test('TC-INV-02: sorting produk A-Z terurut benar', async () => {
+  test('TC-INV-02: Verifikasi sistem berhasil mengurutkan daftar produk berdasarkan Nama (A ke Z)', async () => {
     await inventoryPage.sortBy('az');
     const names = await inventoryPage.getAllProductNames();
     const sorted = [...names].sort((a, b) => a.localeCompare(b));
     expect(names).toEqual(sorted);
   });
 
-  test('TC-INV-03: sorting produk Z-A terurut benar', async () => {
+  test('TC-INV-03: Verifikasi sistem berhasil mengurutkan daftar produk berdasarkan Nama (Z ke A)', async () => {
     await inventoryPage.sortBy('za');
     const names = await inventoryPage.getAllProductNames();
     const sorted = [...names].sort((a, b) => b.localeCompare(a));
     expect(names).toEqual(sorted);
   });
 
-  test('TC-INV-04: sorting harga rendah-tinggi', async () => {
+  test('TC-INV-04: Verifikasi sistem berhasil mengurutkan daftar produk berdasarkan Harga (Termurah ke Termahal)', async () => {
     await inventoryPage.sortBy('lohi');
     const prices = await inventoryPage.getAllProductPrices();
     const sorted = [...prices].sort((a, b) => a - b);
     expect(prices).toEqual(sorted);
   });
 
-  test('TC-INV-05: sorting harga tinggi-rendah', async () => {
+  test('TC-INV-05: Verifikasi sistem berhasil mengurutkan daftar produk berdasarkan Harga (Termahal ke Termurah)', async () => {
     await inventoryPage.sortBy('hilo');
     const prices = await inventoryPage.getAllProductPrices();
     const sorted = [...prices].sort((a, b) => b - a);
     expect(prices).toEqual(sorted);
   });
 
-  test('TC-INV-06: tambah 1 produk ke cart, badge = 1', async () => {
+  test('TC-INV-06: Verifikasi penambahan 1 produk ke keranjang memperbarui indikator badge keranjang menjadi 1', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
   });
 
-  test('TC-INV-07: tambah 2 produk ke cart, badge = 2', async () => {
+  test('TC-INV-07: Verifikasi penambahan 2 produk ke keranjang memperbarui indikator badge keranjang menjadi 2', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.expectCartBadge(2);
   });
 
-  test('TC-INV-08: tambah 3 produk ke cart, badge = 3', async () => {
+  test('TC-INV-08: Verifikasi penambahan 3 produk ke keranjang memperbarui indikator badge keranjang menjadi 3', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.addProductToCart('Sauce Labs Bolt T-Shirt');
     await inventoryPage.expectCartBadge(3);
   });
 
-  test('TC-INV-09: hapus 1 produk dari inventory page, badge berkurang jadi 0', async () => {
+  test('TC-INV-09: Verifikasi penghapusan 1 produk dari keranjang mengurangi nilai badge dengan benar', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
     await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
     await inventoryPage.expectCartBadge(0);
   });
 
-  test('TC-INV-10: hapus 1 produk dari total 2 dari inventory page, badge berkurang jadi 1', async () => {
+  test('TC-INV-10: Verifikasi penghapusan 1 produk dari total 2 produk memperbarui sisa badge menjadi 1', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.expectCartBadge(2);

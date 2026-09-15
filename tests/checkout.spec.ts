@@ -57,7 +57,6 @@ test.describe('Module: Checkout', () => {
     expect(Math.round((subtotal + tax) * 100) / 100).toBeCloseTo(total, 2);
   });
 
-  // CHK-06
   test('TC-CHKT-06: cancel checkout kembali ke inventory, cart tetap terisi', async ({ page }) => {
     await checkoutPage.cancelButton.click();
     await expect(page).toHaveURL(/cart.html/);
