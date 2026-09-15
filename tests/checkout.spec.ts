@@ -25,45 +25,45 @@ test.describe('Module: Checkout', () => {
     checkoutPage = new CheckoutPage(page);
   });
 
-  test('TC-CHKT-01: checkout sukses end-to-end', async () => {
+  test('TC-CHKT-01: Verifikasi user dapat menyelesaikan proses checkout secara penuh dari keranjang hingga pesanan selesai', async () => {
     await checkoutPage.fillInformation('Bagas', 'Setiawan', '53415');
     await checkoutPage.continueStep();
     await checkoutPage.finishOrder();
     await checkoutPage.expectOrderComplete();
   });
 
-  test('TC-CHKT-02: validasi First Name kosong', async () => {
+  test('TC-CHKT-02: Verifikasi sistem menolak proses checkout dan menampilkan pesan ketika kolom First Name dikosongkan', async () => {
     await checkoutPage.fillInformation('', 'Setiawan', '53415');
     await checkoutPage.continueStep();
     await checkoutPage.expectErrorToContain('First Name is required');
   });
 
-  test('TC-CHKT-03: validasi Last Name kosong', async () => {
+  test('TC-CHKT-03: Verifikasi sistem menolak proses checkout dan menampilkan pesan ketika kolom Last Name dikosongkan', async () => {
     await checkoutPage.fillInformation('Bagas', '', '53415');
     await checkoutPage.continueStep();
     await checkoutPage.expectErrorToContain('Last Name is required');
   });
 
-  test('TC-CHKT-04: validasi Postal Code kosong', async () => {
+  test('TC-CHKT-04: Verifikasi sistem menolak proses checkout dan menampilkan pesan ketika kolom Postal Code dikosongkan', async () => {
     await checkoutPage.fillInformation('Bagas', 'Setiawan', '');
     await checkoutPage.continueStep();
     await checkoutPage.expectErrorToContain('Postal Code is required');
   });
 
-  test('TC-CHKT-05: verifikasi kalkulasi total harga (subtotal + tax = total)', async () => {
+  test('TC-CHKT-05: Verifikasi kalkulasi total harga produk, pajak (tax), dan keseluruhan biaya pada halaman ringkasan tampil dengan akurat', async () => {
     await checkoutPage.fillInformation('Bagas', 'Setiawan', '53415');
     await checkoutPage.continueStep();
     const { subtotal, tax, total } = await checkoutPage.getTotals();
     expect(Math.round((subtotal + tax) * 100) / 100).toBeCloseTo(total, 2);
   });
 
-  test('TC-CHKT-06: cancel checkout kembali ke inventory, cart tetap terisi', async ({ page }) => {
+  test('TC-CHKT-06: Verifikasi tombol Cancel berfungsi mengarahkan user kembali ke halaman produk (Inventory) dan membatalkan proses', async ({ page }) => {
     await checkoutPage.cancelButton.click();
     await expect(page).toHaveURL(/cart.html/);
     await inventoryPage.expectCartBadge(2);
   });
 
-  test('TC-CHKT-07: back home setelah order complete, cart kosong', async () => {
+  test('TC-CHKT-07: Verifikasi tombol Back Home berfungsi mengarahkan user kembali ke halaman produk setelah pesanan sukses dibuat', async () => {
     await checkoutPage.fillInformation('Bagas', 'Setiawan', '53415');
     await checkoutPage.continueStep();
     await checkoutPage.finishOrder();

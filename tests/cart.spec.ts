@@ -16,7 +16,7 @@ test.describe('Module: Cart', () => {
     cartPage = new CartPage(page);
   });
  
-  test('TC-CART-01: tambah 1 produk ke cart, produk bertambah 1', async () => {
+  test('TC-CART-01: Verifikasi sistem berhasil menambahkan 1 produk ke dalam keranjang dan memperbarui ikon badge', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
 
@@ -24,27 +24,27 @@ test.describe('Module: Cart', () => {
     await expect(cartPage.productNames).toBeVisible;
   });
 
-  test('TC-CART-02: tambah 2 produk ke cart, produk bertambah 2', async () => {
+  test('TC-CART-02: Verifikasi sistem berhasil menambahkan 2 produk secara akumulatif ke dalam keranjang', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.expectCartBadge(2);
   });
 
-  test('TC-CART-03: tambah 3 produk ke cart, produk bertambah 3', async () => {
+  test('TC-CART-03: Verifikasi sistem berhasil menambahkan 3 produk secara akumulatif ke dalam keranjang', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.addProductToCart('Sauce Labs Bolt T-Shirt');
     await inventoryPage.expectCartBadge(3);
   });
 
-  test('TC-CART-04: hapus 1 produk dari total 1, keranjang kosong', async () => {
+  test('TC-CART-04: Verifikasi sistem berhasil menghapus 1 produk dari keranjang dan memperbarui badge', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.expectCartBadge(1);
     await inventoryPage.removeFromCartByName('Sauce Labs Backpack').click();
     await inventoryPage.expectCartBadge(0);
   });
 
-  test('TC-CART-05: hapus 1 produk dari total 2 produk, produk sisa 1', async () => {
+  test('TC-CART-05: Verifikasi sistem berhasil menghapus 1 produk dari total 2 produk dan menyisakan 1 di keranjang', async () => {
     await inventoryPage.addProductToCart('Sauce Labs Backpack');
     await inventoryPage.addProductToCart('Sauce Labs Bike Light');
     await inventoryPage.expectCartBadge(2);
